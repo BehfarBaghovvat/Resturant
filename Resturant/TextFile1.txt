@@ -1,0 +1,118 @@
+﻿		#region SaveButton_Click
+		private void SaveButton_Click(object sender, System.EventArgs e)
+		{
+			
+
+
+				System.Windows.Forms.DialogResult dialogResult;
+
+				dialogResult = Mbb.Windows.Forms.MessageBox.QuestionMessage
+					(text: "مشترک مورد نظر ثبت گردد؟",
+					captiopn: "ثبت مشتری",
+					buttons: System.Windows.Forms.MessageBoxButtons.YesNo,
+					defaultButton: System.Windows.Forms.MessageBoxDefaultButton.Button2,
+					icon: System.Windows.Forms.MessageBoxIcon.Question,
+					options: System.Windows.Forms.MessageBoxOptions.RightAlign |
+					 System.Windows.Forms.MessageBoxOptions.RtlReading);
+
+				if (dialogResult == System.Windows.Forms.DialogResult.Yes)
+				{
+					Models.Customer customer =
+						dataBaseContext.Customers
+						.Where(current => string.Compare(current.CustomerAddress,customerAddressTextBox.Text) == 0)
+						.FirstOrDefault();
+
+					if (customer != null)
+					{
+						errorMessage =
+							$"تلفن مورد نظر برای نام {customer.CustomerName} ثبت گردیده! ";
+						Mbb.Windows.Forms.MessageBox.InformationMessage(errorMessage);
+						customerAddressTextBox.Focus();
+						return;
+					}
+
+					else
+					{
+						customer =
+							new Models.Customer
+							{
+								SubscriptionCode = int.Parse(subscriptionCodeLabel.Text),
+								CustomerName = customerNameTextBox.Text,
+								CustomerTel = customerTelMaskedBox.Text,
+								CustomerAddress = customerAddressTextBox.Text,
+								OrderDate = OrderDate,
+							};
+
+						dataBaseContext.Customers.Add(customer);
+						dataBaseContext.SaveChanges();
+					}
+				}
+				else
+				{
+					return;
+				}
+
+				string message =
+					$"مشترک با کد اشتراک {SubscriptionCode} ثبت گردید.";
+
+				Infrastructure.Utility.WindowsNotification
+					(message: message,
+					caption: Infrastructure.PopupNotificationForm.Caption.موفقیت,
+					picture: string.Empty);
+
+			}
+			catch (System.Exception ex)
+			{
+				Infrastructure.Utility.PopupNotification(ex);
+			}
+			finally
+			{
+				if (dataBaseContext != null)
+				{
+					dataBaseContext.Dispose();
+					dataBaseContext = null;
+				}
+			}
+		}
+		#endregion /SaveButton_Click
+
+		#region ResetButton_Click
+		private void ResetButton_Click(object sender, System.EventArgs e)
+		{
+
+		}
+		#endregion /ResetButton_Click
+
+		//-----End of codes.
+
+		#region Methods
+		//-----
+		#region ErrorMessage
+		public void ErrorMessage(string message)
+		{
+			errorMessageLabel.Visible = true;
+			errorMessageLabel.Text = "       " + message;
+		}
+		#endregion /ErrorMessage
+
+		#region AllClear
+		private void AllClear()
+		{
+			
+		}
+		#endregion /AllClear
+
+		#region RandomNumber
+		public int RandomNumbers()
+		{
+			int number;
+
+			System.Random generator =
+				new System.Random();
+			number = generator.Next(minValue: 1000, maxValue: 9999);
+
+			return number;
+		}
+		#endregion RandomNumber
+		//-----
+		#endregion /Methods
